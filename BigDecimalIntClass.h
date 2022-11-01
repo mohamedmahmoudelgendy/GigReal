@@ -26,26 +26,30 @@ private:
     bool checkValidInput(string input);
 
 public:
+    // mohamed add
+    BigDecimalInt& push_back(string zero);
+    BigDecimalInt& pop_front();
+    BigDecimalInt& change_sign_to(char sign);
+    // .
+
     bool operator < (const BigDecimalInt& anotherDec);
     bool operator > (const BigDecimalInt& anotherDec);
     bool operator == (const BigDecimalInt anotherDec);
-    BigDecimalInt& operator= (string n);
     BigDecimalInt& operator = (BigDecimalInt anotherDec);
     BigDecimalInt operator + (BigDecimalInt number2);
-    BigDecimalInt& push_back(string zero);
-    BigDecimalInt& pop_front();
     BigDecimalInt operator - (BigDecimalInt anotherDec);
     friend ostream &operator << (ostream &out, BigDecimalInt num);
     int size();
     int sign();
     void setNumber(string num);
     string getNumber(){
-        return number;
+        return number ;
     }
 
      BigDecimalInt()
      {
         number = "0" ;
+        signNumber = '+' ;
      }
     BigDecimalInt(string num)
     {
