@@ -3,25 +3,6 @@
 #include <string>
 using namespace std;
 
-BigDecimalInt& BigDecimalInt:: operator= (string n){
-        if(number[0] == '+')
-        {
-            n.erase(0,1);
-            signNumber = '+';
-        }
-        else if (n[0] == '-')
-        {
-            n.erase(0,1);
-            signNumber = '-';
-        }
-        else
-        {
-            signNumber = '+';
-        }
-        number = n ;
-        return *this ; 
-    }
-
 BigDecimalInt& BigDecimalInt::push_back(string zero){
     number += zero ;
     return *this ;
@@ -29,6 +10,11 @@ BigDecimalInt& BigDecimalInt::push_back(string zero){
 
 BigDecimalInt& BigDecimalInt::pop_front(){
     number.erase(0,1);
+    return *this ;
+}
+
+BigDecimalInt& BigDecimalInt::change_sign_to(char sign){
+    signNumber = sign ;
     return *this ;
 }
 
@@ -41,8 +27,8 @@ class BigReal {
     public:
         
         BigReal(){
-            integer = "0" ;
-            fraction = "0";
+            integer.setNumber("0") ;
+            fraction.setNumber("0");
             number_sign = '+' ;
             fractian_length = 1 ;
         }
@@ -50,18 +36,15 @@ class BigReal {
         BigReal(string number){
             string I , F ;
             bool point_found = false ;
-            if(number[0] == '+')
-            {
+            if(number[0] == '+'){
                 number.erase(0,1);
                 number_sign = '+';
             }
-            else if (number[0] == '-')
-            {
+            else if (number[0] == '-'){
                 number.erase(0,1);
                 number_sign = '-';
             }
-            else
-            {
+            else{
                 number_sign = '+';
             }
             for(int i = 0 ; i < number.length() ; i++ ){
@@ -75,73 +58,85 @@ class BigReal {
                     F.push_back(number[i]);
                 }
             }
-            integer = I ;
-            fraction = F ;
+            integer.setNumber(I) ;
+            fraction.setNumber(F) ;
+            integer.change_sign_to(number_sign);
+            fraction.change_sign_to(number_sign);
             fractian_length = F.length() ;
         }
 
-        // friend ostream& operator<<(ostream& out , BigReal other){
-        //     if(other.number_sign == '+'){
-        //         out << other.integer << '.' << other.fraction ;
-        //     }
-        //     else{
-        //         if(other.integer == "0"  && ){
-        //             out << num.number ;
-        //         }
-        //         else{
-        //             out << num.signNumber << num.number ;
-        //         }
-        //     }
-            
-        //     return out ;
-        // }
+        friend ostream& operator<<(ostream& out , BigReal other){
+            BigDecimalInt zero("0") ;
+            if(other.number_sign == '+'){
+                out << other.integer << '.' << other.fraction ;
+            }
+            else{
+                if(other.integer == zero && other.fraction == zero ){
+                    out << other.integer << '.' << other.fraction ;
+                }
+                else{
+                    out << other.integer << '.' << other.fraction.getNumber() ;
+                }
+            }
+            return out ;
+        }
 
-        // BigReal operator+(BigReal& other){
-        //     BigReal third ;
-        //     if(fraction.size() > other.fraction.size()){
-        //         while(fraction.size() != other.fraction.size()){
-        //             other.fraction.push_back("0") ;
-        //         }
-        //     }
-        //     else if (fraction.size() < other.fraction.size()){
-        //         while(fraction.size() != other.fraction.size()){
-        //             fraction.push_back("0") ;
-        //         }
-        //     }
-        //     third.fractian_length = fraction.size() ;
-        //     if(integer > other.integer){
-        //         third.number_sign = number_sign ;
-        //     }
-        //     else if(integer < other.integer){
-        //         third.number_sign = other.number_sign ;
-        //     }
-        //     else if (){
+        BigReal operator+(BigReal other){
+            BigReal third ;
+            while(fraction.size() > other.fraction.size()){
+                other.fraction.push_back("0") ;
+            }
+            while(fraction.size() < other.fraction.size()){
+                fraction.push_back("0") ;
+            }
+            if(number_sign == other.number_sign){
+                third.number_sign = number_sign ;
+                third.fractian_length = fraction.size() ;
+                third.integer = integer + other.integer ;
+                third.fraction = fraction + other.fraction ;
+                if (third.fractian_length < third.fraction.size()){
+                    if(number_sign == '+'){
+                        BigDecimalInt one("1") ;
+                        third.integer = third.integer + one ;
+                        third.fraction.pop_front();
+                    }
+                    else{
+                        BigDecimalInt one("-1") ;
+                        third.integer = third.integer + one ;
+                        third.fraction.pop_front();
+                    }
+                }
+            }
+            else{
+                if(integer.sign() == 0){
+                    integer.change_sign_to('+');
+                    fraction.change_sign_to('+');
+                    third.integer = (other.integer - integer);
+                    third.fraction = (other.fraction - fraction);
+                }
+                else{
+                    other.integer.change_sign_to ('+');
+                    other.fraction.change_sign_to ('+');
+                    third.integer = (integer - other.integer);
+                    third.fraction = (fraction - other.fraction);
+                }
+            } 
+            return third ;
+        }
 
-        //     }
-        //     third.integer = integer + other.integer ;
-        //     third.fraction = fraction + other.fraction ;
-        //     if (third.fractian_length < third.fraction.size()){
-        //       BigDecimalInt one ;
-        //       one = "1" ;
-        //       third.integer = third.integer + one ;
-        //       third.fraction.pop_front();
-        //     }
-        //     return third ;
-        // }
-
-        // BigReal operator-(BigReal& other){
-        //     BigReal third ;
-        //     third.integer = integer - other.integer ;
-        //     third.fraction = fraction - other.fraction ;
-        //     return third ;
-        // }        
+//         BigReal operator-(BigReal& other){
+//             BigReal third ;
+//             third.integer = integer - other.integer ;
+//             third.fraction = fraction - other.fraction ;
+//             return third ;
+//         }        
 
     
 };
 
 int main(){
     //BigDecimalInt c , v ;
-    // BigReal a("232.924") , b("5796.3") ;
-    // cout << a+b ;
+    BigReal a("232.924") , b("5796.39") ;
+    cout << a+b ;
 
 }
