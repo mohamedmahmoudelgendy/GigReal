@@ -109,12 +109,14 @@ class BigReal {
             }
             else{
                 if(integer.sign() == 0){
+                    number_sign = '+' ;
                     integer.change_sign_to('+');
                     fraction.change_sign_to('+');
                     third.integer = (other.integer - integer);
                     third.fraction = (other.fraction - fraction);
                 }
                 else{
+                    other.number_sign = '+' ;
                     other.integer.change_sign_to ('+');
                     other.fraction.change_sign_to ('+');
                     third.integer = (integer - other.integer);
