@@ -71,8 +71,8 @@ class BigReal {
             add_zeros(*this ,other) ;
             Return.sum = (sum + other.sum) ;
             string sign ;
-            if(sum.sign() == 1){sign = "" ;}
-            else if (sum.sign() == 0){sign = '-';}
+            if(Return.sum.sign() == 1){sign = "" ;}
+            else if (Return.sum.sign() == 0){sign = '-';}
             string test = (Return.integer.getNumber() + '.' + Return.fraction.getNumber()) , Result = Return.sum.getNumber() ;
             for(int i = 0 ; i < Result.length() ; i++){
                 if(Result[i] != test[i] && (abs((Result[i]- '0')-(test[i]- '0')) == 1)){
