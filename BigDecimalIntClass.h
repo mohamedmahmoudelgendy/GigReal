@@ -26,9 +26,6 @@ private:
     bool checkValidInput(string input);
 
 public:
-    // mohamed add
-    BigDecimalInt& push_back(string zero);
-    // .
 
     bool operator < (const BigDecimalInt& anotherDec);
     bool operator > (const BigDecimalInt& anotherDec);
