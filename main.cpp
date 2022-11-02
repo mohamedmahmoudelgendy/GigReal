@@ -138,6 +138,10 @@ int main() {
     //     a.setNumber("100");
     //     cout << a.getNumber() << "\n";
     // }
+    
+    BigReal a("1234.45") , b("2313.6");
+    cout<< a+b ;
+    
     return 0;
 }
 
