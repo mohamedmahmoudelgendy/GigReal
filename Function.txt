@@ -1,0 +1,79 @@
+bool operator > ( BigReal& anotherReal) {
+
+            if (this->integer > anotherReal.integer) {
+                return true;
+            }
+            else if (this->integer == anotherReal.integer) {
+                if (this->fraction > anotherReal.fraction) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
+    }
+    bool operator < ( BigReal &anotherReal) {
+
+            if (this->integer < anotherReal.integer) {
+                return true;
+            }
+            else if (this->integer == anotherReal.integer) {
+                if (this->fraction < anotherReal.fraction) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
+    }
+bool operator == ( BigReal &anotherReal){
+            if (number_sign == anotherReal.number_sign &&integer == anotherReal.integer &&fraction == anotherReal.fraction&& fractian_length == anotherReal.fractian_length  ){
+                return true ;
+            }
+            else {
+                return false;
+            }
+    }
+BigReal operator = (BigReal &anotherReal){
+            number_sign = anotherReal.number_sign;
+            integer = anotherReal.integer;
+            fraction = anotherReal.fraction;
+            fractian_length = anotherReal.fractian_length;
+        return *this;
+        }
+
+    int Sign(){
+        if (number_sign == '+'){
+            return 1 ;
+        }
+        else{
+            return -1;
+        }
+    }
+
+    int Size (){
+        return integer.size() + fractian_length;
+    }
+
+    friend ostream& operator<<(ostream& out , BigReal other){
+        BigDecimalInt zero("0") ;
+        if(other.number_sign == '+'){
+            out << other.integer << '.' << other.fraction ;
+        }
+        else{
+            if(other.integer == zero && other.fraction == zero ){
+                out << other.integer << '.' << other.fraction ;
+            }
+            else{
+                out << other.integer << '.' << other.fraction.getNumber() ;
+            }
+        }
+        return out ;
+    }
+};
