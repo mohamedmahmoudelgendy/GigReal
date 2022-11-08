@@ -25,23 +25,42 @@ class BigReal {
         }
         
         BigReal(string number){
-            result = number ;
             string I , F ;
-            bool point_found = false ;
+            int point_found = 0 ;
             for(int i = 0 ; i < number.length() ; i++ ){
                 if(number[i] == '.'){
-                    point_found = true ;
+                    point_found += 1 ;
                 }
-                if(point_found == false){
+                if(point_found == 0){
                     I.push_back(number[i]);
                 }
-                else if(point_found == true && number[i] != '.' ){
+                else if(point_found == 1 && number[i] != '.' ){
                     F.push_back(number[i]);
                 }
+                else if(point_found > 1){
+                    cout<< "invalid" << endl ;
+                    exit(1);
+                }
             }
-            integer.setNumber(I) ;
-            fraction.setNumber(F) ;
-            sum = integer;
+        
+            if(I.empty()){
+                integer.setNumber("0") ;
+                result = "0" ;
+            }
+            else{
+                integer.setNumber(I) ;
+                result = I ;
+            }
+
+            if(F.empty()){
+                fraction.setNumber("0") ;
+                result += ".0" ;
+            }
+            else{
+                fraction.setNumber(F) ;
+                result += "." + F ;
+            }
+            sum = integer ;
             sum.setNumber(push_back(sum , fraction.getNumber()));
         }
 
