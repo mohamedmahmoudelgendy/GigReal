@@ -65,6 +65,30 @@ class BigReal {
             sum.setNumber(push_back(sum , fraction.getNumber()));
         }
 
+          //Lvalues
+    BigReal (const BigReal& other){
+        integer= other.integer;
+        fraction= other.fraction;
+        sum= other.sum;
+        result= other.result;
+
+    }
+
+        //Rvalues
+        BigReal (BigReal&& other){
+        this->integer= other.integer;
+        this->fraction= other.fraction;
+        this->sum= other.sum;
+        this->result= other.result;
+        cout<<"move constractor/n";
+
+        other.integer.setNumber("0") ;
+        other.fraction.setNumber("0");
+        other.sum.setNumber("0");
+        other.result = "0";
+
+    }
+
         static void add_zeros(BigReal& a ,BigReal& b){
             int result = (a.fraction.size() - b.fraction.size()) ;
             for(int i = 0 ; i < abs(result) ; i++){
