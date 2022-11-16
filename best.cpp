@@ -15,60 +15,17 @@ class BigReal {
         BigDecimalInt integer ;
         BigDecimalInt fraction ;
         BigDecimalInt sum ;
-        string result ;    
+        string result ;
     public:
 
-        BigDecimalInt add_zeros(BigReal a ,BigReal b , char sign){
-            BigDecimalInt s ; int result = (a.fraction.size() - b.fraction.size()) ;
-            for(int i = 0 ; i < abs(result) ; i++){
-                if(result > 0){
-                    b.sum.setNumber(push_back(b.sum,"0"));
-                    if(sign == '+'){
-                        s =(a.sum + b.sum);
-                    }
-                    else if(sign == '-'){
-                        s =(a.sum - b.sum);
-                    }
-                }
-                else if(result < 0){
-                    a.sum.setNumber(push_back(a.sum,"0"));
-                    if(sign == '+'){
-                        s =(a.sum + b.sum);
-                    }
-                    else if(sign == '-'){
-                        s =(a.sum - b.sum);
-                    }
-                }
-                else{
-                    break;
-                }
-            }
-            return s ;
+        BigReal(){
+            integer.setNumber("0") ;
+            fraction.setNumber("0");
+            sum.setNumber("0");
+            result = "0" ;
         }
 
-        BigReal operations_on_plus_and_minus(BigReal r){
-            string sign = "" , test , Result ;
-            Result = r.sum.getNumber() ;
-            test = (r.integer.getNumber() + '.' + r.fraction.getNumber()) ;
-            for(int i = 0 ; i < Result.length() ; i++){
-                if(Result[i] != test[i] && (abs((Result[i]- '0')-(test[i]- '0')) == 1)){
-                    Result.insert(i+1,".");
-                    break;
-                }
-                else if(Result[i] != test[i]){
-                    Result.insert(i,".");
-                    break;
-                }
-            }
-            if(Result[0] == '.'){
-                Result = '0' + Result ;
-            }
-            if (r.sum.sign() == 0){sign = '-';}
-            r.result = (sign + Result) ;
-            return r ;
-        }
-
-        void constructors(string number){
+        explicit BigReal(const string number){
             string I , F ;
             int point_found = 0 ;
             for(char i : number){
@@ -104,121 +61,143 @@ class BigReal {
                 fraction.setNumber(F) ;
                 result += "." + F ;
             }
-
             sum = integer ;
             sum.setNumber(push_back(sum , fraction.getNumber()));
         }
-        
-        BigReal(){
-            integer.setNumber("0") ;
-            fraction.setNumber("0");
-            sum.setNumber("0");
-            result = "0" ;
+
+          //Lvalues
+    BigReal (const BigReal& other){
+        cout<<"copy constractor"<<endl;
+        integer= other.integer;
+        fraction= other.fraction;
+        sum= other.sum;
+        result= other.result;
+    }
+
+        //Rvalues
+        BigReal (BigReal&& other){
+        this->integer= other.integer;
+        this->fraction= other.fraction;
+        this->sum= other.sum;
+        this->result= other.result;
+        cout<<"move constractor\n";
+
+        other.integer.setNumber("0") ;
+        other.fraction.setNumber("0");
+        other.sum.setNumber("0");
+        other.result = nullptr;
+
+    }
+
+        static void add_zeros(BigReal& a ,BigReal& b){
+            int result = (a.fraction.size() - b.fraction.size()) ;
+            for(int i = 0 ; i < abs(result) ; i++){
+                if(result > 0){
+                    b.sum.setNumber(push_back(b.sum,"0"));
+                }
+                else if(result < 0){
+                    a.sum.setNumber(push_back(a.sum,"0"));
+                }
+                else{
+                    break;
+                }
+            }
         }
 
-        explicit BigReal(const string number){
-            constructors(number);
+        friend ostream& operator<<(ostream& out , const BigReal other){
+            out<<other.result ;
+            return out ;
         }
-
-        BigReal(BigDecimalInt biginteger){
-            string number = biginteger.getNumber() ;
-            if(biginteger.sign() == 0){ number = '-' + number ;}
-            constructors(number);
-        }
-
-        // //Lvalues
-        // BigReal (const BigReal& other){
-        //     integer= other.integer;
-        //     fraction= other.fraction;
-        //     sum= other.sum;
-        //     result= other.result;
-
-        // }
-
-        // //Rvalues
-        // BigReal (BigReal&& other){
-        // this->integer= other.integer;
-        // this->fraction= other.fraction;
-        // this->sum= other.sum;
-        // this->result= other.result;
-        // cout<<"move constractor/n";
-
-        // other.integer.setNumber("0") ;
-        // other.fraction.setNumber("0");
-        // other.sum.setNumber("0");
-        // other.result = "0";
-
-        // }
-
-        BigReal& operator=(BigReal &anotherReal) {
-            integer = anotherReal.integer;
-            fraction = anotherReal.fraction;
-            sum = anotherReal.sum ;
-            result = anotherReal.result ;
-            return *this;
-        }
-
 
         BigReal operator+(BigReal other){
             BigReal Return ;
             Return.integer = integer + other.integer ;
             Return.fraction = fraction + other.fraction ;
-            if((fraction.size()- other.fraction.size()) != 0){
-                Return.sum = add_zeros(*this ,other,'+') ;
+            add_zeros(*this ,other) ;
+            Return.sum = (sum + other.sum) ;
+            string sign ;
+            if(Return.sum.sign() == 1){sign = "" ;}
+            else if (Return.sum.sign() == 0){sign = '-';}
+            string test = (Return.integer.getNumber() + '.' + Return.fraction.getNumber()) , Result = Return.sum.getNumber() ;
+            for(int i = 0 ; i < Result.length() ; i++){
+                if(Result[i] != test[i] && (abs((Result[i]- '0')-(test[i]- '0')) == 1)){
+                    Result.insert(i+1,".");
+                    break;
+                }
+                else if(Result[i] != test[i]){
+                    Result.insert(i,".");
+                    break;
+                }
             }
-            else{
-                Return.sum = sum + other.sum ;
+            if(Result[0] == '.'){
+                Result = '0' + Result ;
             }
-            return operations_on_plus_and_minus(Return);
+            Return.result = (sign + Result) ;
+            return Return ;
         }
 
         BigReal operator-(BigReal other){
-            BigReal Return ; 
+            BigReal Return ;
             Return.integer = integer - other.integer ;
             Return.fraction = fraction - other.fraction ;
-           if((fraction.size()- other.fraction.size()) != 0){
-                Return.sum = add_zeros(*this ,other,'-') ;
+            add_zeros(*this ,other) ;
+            Return.sum = (sum - other.sum) ;
+            string sign ;
+            if(Return.sum.sign() == 1){sign = "" ;}
+            else if (Return.sum.sign() == 0){sign = '-';}
+            string test = (Return.integer.getNumber() + '.' + Return.fraction.getNumber()) , Result = Return.sum.getNumber() ;
+            for(int i = 0 ; i < Result.length() ; i++){
+                if(Result[i] != test[i] && (abs((Result[i]- '0')-(test[i]- '0')) == 1)){
+                    Result.insert(i+1,".");
+                    break;
+                }
+                else if(Result[i] != test[i]){
+                    Result.insert(i,".");
+                    break;
+                }
             }
-            else{
-                Return.sum = sum - other.sum ;
+            if(Result[0] == '.'){
+                Result = '0' + Result ;
             }
-            return operations_on_plus_and_minus(Return);
+            Return.result = (sign + Result) ;
+            return Return ;
+        }
+
+
+        bool operator > ( BigReal& anotherReal) {
+
+                if (this->integer > anotherReal.integer) {
+                    return true;
+                }
+                else if (this->integer == anotherReal.integer) {
+                    if (this->fraction > anotherReal.fraction) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else {
+                    return false;
+                }
         }
 
         bool operator < ( BigReal &anotherReal) {
 
-            if (this->integer < anotherReal.integer) {
-                return true;
-            }
-            else if (this->integer == anotherReal.integer) {
-                if (this->fraction < anotherReal.fraction) {
+                if (this->integer < anotherReal.integer) {
                     return true;
+                }
+                else if (this->integer == anotherReal.integer) {
+                    if (this->fraction < anotherReal.fraction) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
                 }
                 else {
                     return false;
                 }
-            }
-            else {
-                return false;
-            }
-        }
-
-        bool operator > ( BigReal& anotherReal) {
-
-            if (this->integer > anotherReal.integer) {
-                return true;
-            }
-            else if (this->integer == anotherReal.integer) {
-                if (this->fraction > anotherReal.fraction) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
-            else {
-                return false;
-            }
         }
 
         bool operator == ( BigReal &anotherReal){
@@ -230,10 +209,6 @@ class BigReal {
             }
         }
 
-        int Size (){
-            return sum.size() ;
-        }
-
         int Sign(){
             if (sum.sign() == 1){
                 return 1 ;
@@ -243,13 +218,20 @@ class BigReal {
             }
         }
 
-        friend ostream& operator<<(ostream& out , const BigReal other){
-            out<<other.result ;
-            return out ;
+        int Size (){
+            return sum.size() ;
+        }
+
+       BigReal& operator=(BigReal &anotherReal) {
+            integer = anotherReal.integer;
+            fraction = anotherReal.fraction;
+            sum = anotherReal.sum ;
+            result = anotherReal.result ;
+            return *this;
         }
 
         friend istream& operator>>(istream& in, BigReal& other) {
-            string number ;   
+            string number ;
             cout << "Enter a number: ";
             in >> number;
             BigReal temp(number);
@@ -261,8 +243,8 @@ class BigReal {
 
 int main(){
     //BigDecimalInt a("232") , b("5796") ;
-    BigReal a("12.3") , b("6.759") , c ;
-    cout << a <<endl;
+    BigReal a("-232.924999") , b("5796.399") , c ;
+    /*cout << a <<endl;
     cout << b << endl ;
     cout << a+b<<endl;
     cout << a-b <<endl;
@@ -276,14 +258,16 @@ int main(){
     cout << c <<endl;
     cout << b << endl ;
     cout << c + b << endl ;
-    cout << c - b <<endl;  
+    cout << c - b <<endl;  //wrong output
     cout << c.operator==(b) <<endl;
     cout << c.operator>(b) <<endl;
     cout << c.operator<(b) <<endl;
-    cout << c.Size()<<endl;
-    cout << c.Sign()<<endl;
+    cout << c.Size()<<endl; //wrong output
+    cout << c.Sign()<<endl;*/
+    BigReal e(move(a));
+    cout<<e<<endl;
+    //cout<<a<<endl;
     cout << "------------------------------------------------------------"<<endl;
-
     //5564.534 done
     //5563.466 done
     //-5564.534 done
